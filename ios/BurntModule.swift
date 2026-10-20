@@ -261,6 +261,14 @@ public class BurntModule: Module {
         haptic: options.haptic.toSPAlertHaptic())
     }.runOnQueue(.main)
     
+    AsyncFunction("dialogAsync") { (options: NativeDialogOptions, promise: Promise) in
+      OverlayCoordinator.shared.enqueue(options, promise: promise)
+    }.runOnQueue(.main)
+
+    AsyncFunction("dismissAllDialogsAsync") { () -> Void in
+      OverlayCoordinator.shared.dismissAll()
+    }.runOnQueue(.main)
+
     AsyncFunction("dismissAllAlertsAsync") {
       return SPAlert.dismiss()
     }.runOnQueue(.main)

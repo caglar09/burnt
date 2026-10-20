@@ -1,5 +1,9 @@
 import { AlertOptions, ToastOptions } from "./types";
 import { ToastAndroid } from "react-native";
+import { requireNativeModule } from "expo-modules-core";
+import type { DialogOptions, DialogResult } from "./dialog.types";
+
+const NativeDialogs = requireNativeModule("Burnt");
 
 export default {
   alertAsync({ message, title, preset, duration }: AlertOptions) {
@@ -18,6 +22,12 @@ export default {
       25,
       50
     );
+  },
+  dialogAsync(options: DialogOptions): Promise<DialogResult> {
+    return NativeDialogs.dialogAsync(options);
+  },
+  dismissAllDialogsAsync(): Promise<void> {
+    return NativeDialogs.dismissAllDialogsAsync();
   },
   dismissAllAlertsAsync() {},
 };

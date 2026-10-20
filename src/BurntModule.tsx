@@ -19,6 +19,10 @@ export default {
       );
     }
   },
+  dialogAsync(): Promise<import("./dialog.types").DialogResult> {
+    return Promise.resolve({ status: "dismissed", reason: "lifecycle" });
+  },
+  dismissAllDialogsAsync(): Promise<void> { return Promise.resolve(); },
   dismissAllAlerts() {
     if (isDev) {
       console.log(

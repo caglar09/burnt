@@ -1,0 +1,21 @@
+name: Burnt JS contract checks
+on:
+  push:
+    branches: [master, "feat/**"]
+  pull_request:
+
+jobs:
+  js-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+      - name: Install
+        run: corepack yarn install --frozen-lockfile
+      - name: TypeScript build
+        run: corepack yarn build
+      - name: Unit tests
+        run: corepack yarn test --watch=false --runInBand

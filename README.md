@@ -7,6 +7,80 @@ Cross-platform toasts for React Native, powered by native elements.
 
 Now with Android, iOS & Web Support.
 
+
+## Interactive native dialogs (fork extension)
+
+This fork adds `dialog()`, `confirm()`, `prompt()`, and `dismissAllDialogs()`.
+Unlike the original transient Burnt `alert()`, these are interactive dialogs and return user decisions.
+Both mobile implementations render **native views outside the React Native component tree**:
+iOS uses a scene-bound overlay `UIWindow`; Android uses an Activity-owned `Dialog` window.
+No `SYSTEM_ALERT_WINDOW` permission is required.
+
+```tsx
+import * as Burnt from "burnt";
+
+const confirmed = await Burnt.confirm({
+  title: "Delete comment",
+  message: "This operation cannot be undone.",
+  confirmText: "Delete",
+  cancelText: "Cancel",
+  destructive: true,
+});
+
+if (confirmed) await deleteComment();
+
+const reason = await Burnt.prompt({
+  title: "Rejection reason",
+  placeholder: "Describe the reason...",
+  multiline: true,
+  required: true,
+  maxLength: 500,
+});
+if (reason !== null) await rejectTask(reason);
+```
+
+For full control, call `Burnt.dialog(options)` with unique action IDs, optional fields, a
+`queuePolicy` of `enqueue` (default), `replace` or `reject`, and
+`dismissOnBackdrop`/`dismissOnBack`. The return type is a discriminated union:
+
+```ts
+type DialogResult =
+  | { status: "action"; actionId: string; values: Record<string, string> }
+  | { status: "dismissed"; reason: "backdrop" | "back" | "programmatic" | "lifecycle" };
+```
+
+Calling `dismissAllDialogs()` resolves all queued and active dialogs as dismissed.
+All fields are required to have unique IDs. `required` fields are validated before any
+non-cancel action. `maxLength` is enforced natively. Cancel actions do not validate input.
+
+### Presentation and lifecycle
+
+- iOS: creates a separate `UIWindow` in the active `UIWindowScene` above ordinary
+  React Native modals. On dismissal, restores the previous key window when still valid.
+- Android: uses an Activity-bound Dialog window (no special system overlay permission);
+  its z-order is above existing Activity windows and React Native modal dialogs.
+- Dialog requests are serialized. Scene/activity loss dismisses pending requests.
+- Existing `toast()`, `alert()` and `dismissAllAlerts()` are unchanged.
+- For RN apps without Expo as an application framework, `expo-modules-core` must still be
+  installed/configured because Burnt itself is an Expo Modules native module.
+- Web support is a minimal browser `confirm`/`prompt` fallback, not a pixel-matched modal.
+- Native iOS and Android changes require an application rebuild; JS reload alone is not enough.
+
+### Manual native acceptance suite
+
+In `example/App.tsx`, run both **Confirm Dialog** and **Prompt Dialog** directly on the screen
+and inside **Open Modal** (form sheet). Then verify:
+1. Dialog stays above the existing RN modal; cancelling leaves modal open.
+2. Prompt input appears, keyboard doesn't cover actions, max length and required fields work.
+3. Opening two dialogs serializes the results; `replace` and `reject` policies behave correctly.
+4. Back/backdrop dismissal, programmatic dismissal and lifecycle interruption settle once.
+5. Original Burnt alerts and toasts remain visible on top of modals.
+
+**Important:** The original example uses Expo SDK 47 / RN 0.70. Upgrade its
+development environment before treating it as a modern RN compatibility test.
+The extension should be built and tested with your application's actual React Native version,
+both old and new architecture, on iOS and Android devices.
+
 ## Alerts
 
 https://user-images.githubusercontent.com/13172299/202289223-8a333223-3afa-49c4-a001-a70c76150ef0.mp4

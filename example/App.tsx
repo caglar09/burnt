@@ -17,6 +17,41 @@ export default function App() {
 
   const content = (
     <>
+
+      <View style={{ height: 16 }} />
+      <Text
+        style={[styles.text, styles.purple]}
+        onPress={async () => {
+          const confirmed = await Burnt.confirm({
+            title: "Delete comment",
+            message: "Are you sure? This cannot be undone.",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            destructive: true,
+          });
+          Burnt.toast({ title: confirmed ? "Deleted" : "Cancelled" });
+        }}
+      >
+        Confirm Dialog
+      </Text>
+      <View style={{ height: 16 }} />
+      <Text
+        style={[styles.text, styles.purple]}
+        onPress={async () => {
+          const reason = await Burnt.prompt({
+            title: "Reject task",
+            message: "Tell us why the task is rejected",
+            placeholder: "Reason...",
+            multiline: true,
+            required: true,
+            maxLength: 500,
+            confirmText: "Save",
+          });
+          Burnt.toast({ title: reason === null ? "Cancelled" : "Saved: " + reason });
+        }}
+      >
+        Prompt Dialog
+      </Text>
       <Text
         style={[styles.text, styles.red]}
         onPress={async () => {
