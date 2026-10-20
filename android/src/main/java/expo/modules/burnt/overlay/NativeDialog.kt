@@ -28,9 +28,9 @@ class NativeDialog(
 ) {
   private val night = (activity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
     Configuration.UI_MODE_NIGHT_YES
-  private val foreground = if (night) Color.WHITE else Color.rgb(25, 25, 28)
-  private val background = if (night) Color.rgb(37, 37, 40) else Color.WHITE
-  private val secondary = if (night) Color.rgb(55, 55, 60) else Color.rgb(240, 240, 243)
+  private val foregroundColor = if (night) Color.WHITE else Color.rgb(25, 25, 28)
+  private val backgroundColor = if (night) Color.rgb(37, 37, 40) else Color.WHITE
+  private val secondaryColor = if (night) Color.rgb(55, 55, 60) else Color.rgb(240, 240, 243)
   private val fields = mutableMapOf<String, EditText>()
   private var finished = false
 
@@ -44,7 +44,7 @@ class NativeDialog(
     TextView(activity).apply {
       this.text = text
       textSize = size
-      setTextColor(foreground)
+      setTextColor(foregroundColor)
       gravity = Gravity.CENTER
       if (bold) setTypeface(null, Typeface.BOLD)
     }
@@ -54,7 +54,7 @@ class NativeDialog(
     val box = LinearLayout(activity).apply {
       orientation = LinearLayout.VERTICAL
       setPadding(dp(22), dp(22), dp(22), dp(20))
-      background = shape(background)
+      background = shape(backgroundColor)
     }
     fun append(view: View, marginBottom: Int = 14) {
       val params = LinearLayout.LayoutParams(
@@ -88,9 +88,9 @@ class NativeDialog(
         setText(field.value)
         hint = field.placeholder
         textSize = 16f
-        setTextColor(foreground)
+        setTextColor(foregroundColor)
         setHintTextColor(if (night) Color.LTGRAY else Color.GRAY)
-        background = shape(secondary)
+        background = shape(secondaryColor)
         setPadding(dp(12), dp(11), dp(12), dp(11))
         if (field.type == DialogFieldType.textarea) {
           inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE or
@@ -126,7 +126,7 @@ class NativeDialog(
         textSize = 15f
         isAllCaps = false
         setTypeface(null, Typeface.BOLD)
-        setTextColor(if (action.style == DialogActionStyle.cancel) foreground else Color.WHITE)
+        setTextColor(if (action.style == DialogActionStyle.cancel) foregroundColor else Color.WHITE)
         background = shape(when (action.style) {
           DialogActionStyle.cancel -> secondary
           DialogActionStyle.destructive -> Color.rgb(241, 55, 63)
