@@ -30,6 +30,12 @@ export default {
           : undefined,
     });
   },
+  dialogAsync(options: import("./dialog.types").DialogOptions): Promise<import("./dialog.types").DialogResult> {
+    return BurntModule.dialogAsync(options);
+  },
+  dismissAllDialogsAsync(): Promise<void> {
+    return BurntModule.dismissAllDialogsAsync();
+  },
   dismissAllAlertsAsync() {
     BurntModule.dismissAllAlertsAsync();
   },

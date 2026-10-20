@@ -57,6 +57,24 @@ export default {
       }
     }
   },
+  async dialogAsync(options: import("./dialog.types").DialogOptions): Promise<import("./dialog.types").DialogResult> {
+    if (typeof window === "undefined") return { status: "dismissed", reason: "lifecycle" };
+    const fields = options.fields ?? [];
+    const values: Record<string, string> = {};
+    for (const field of fields) {
+      const value = window.prompt(field.placeholder ?? options.title, field.value ?? "");
+      if (value === null) return { status: "dismissed", reason: "back" };
+      if (field.required && !value.trim()) return { status: "dismissed", reason: "back" };
+      values[field.id] = field.maxLength ? value.slice(0, field.maxLength) : value;
+    }
+    if (!window.confirm([options.title, options.message].filter(Boolean).join("\\n\\n"))) {
+      const cancel = options.actions.find(a => a.style === "cancel");
+      return cancel ? { status: "action", actionId: cancel.id, values } : { status: "dismissed", reason: "back" };
+    }
+    const action = options.actions.find(a => a.style !== "cancel") ?? options.actions[0];
+    return { status: "action", actionId: action.id, values };
+  },
+  async dismissAllDialogsAsync(): Promise<void> {},
   dismissAllAlertsAsync() {
     toast.dismiss();
   },

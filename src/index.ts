@@ -14,3 +14,6 @@ export function toast({ duration = 5, ...options }: ToastOptions) {
 export function dismissAllAlerts() {
   return BurntModule.dismissAllAlertsAsync();
 }
+
+export { dialog, confirm, prompt, dismissAllDialogs } from "./dialog";
+export type { DialogOptions, DialogResult, DialogField, DialogAction, ConfirmOptions, PromptOptions, DialogQueuePolicy } from "./dialog.types";
