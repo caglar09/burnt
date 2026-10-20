@@ -128,7 +128,7 @@ class NativeDialog(
         setTypeface(null, Typeface.BOLD)
         setTextColor(if (action.style == DialogActionStyle.cancel) foregroundColor else Color.WHITE)
         background = shape(when (action.style) {
-          DialogActionStyle.cancel -> secondary
+          DialogActionStyle.cancel -> secondaryColor
           DialogActionStyle.destructive -> Color.rgb(241, 55, 63)
           DialogActionStyle.default -> Color.rgb(28, 99, 237)
         })
