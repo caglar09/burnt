@@ -1,8 +1,4 @@
-const isDev =
-  typeof __DEV__ !== "undefined"
-    ? __DEV__
-    : // @ts-expect-error
-      typeof process !== "undefined" && process.env.NODE_ENV !== "production";
+const isDev = typeof __DEV__ !== "undefined" ? __DEV__ : true;
 
 export default {
   toast() {
