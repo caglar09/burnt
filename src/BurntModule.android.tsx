@@ -14,7 +14,7 @@ export default {
       duration,
     });
   },
-  toastAsync({ title, duration = 5, from = 'bottom' }: ToastOptions) {
+  toastAsync({ title, duration = 5, from = 'bottom' }: Pick<ToastOptions, "title" | "duration" | "from">) {
     ToastAndroid.showWithGravityAndOffset(
       title,
       duration * 1000,
