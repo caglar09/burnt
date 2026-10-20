@@ -1,8 +1,12 @@
 name: Burnt JS contract checks
 on:
   push:
-    branches: [master, "feat/**"]
+    branches: [master]
   pull_request:
+
+concurrency:
+  group: js-contract-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   js-contract:
