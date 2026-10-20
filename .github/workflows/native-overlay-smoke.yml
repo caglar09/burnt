@@ -1,0 +1,73 @@
+name: Native overlay smoke builds
+on:
+  push:
+    branches: ["feat/native-overlay-dialogs"]
+  pull_request:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install library
+        run: corepack yarn install --no-frozen-lockfile
+      - name: Install example
+        working-directory: example
+        run: corepack yarn install --no-frozen-lockfile
+      - name: Generate native Android project
+        working-directory: example
+        run: npx expo prebuild --platform android --no-install
+      - name: Compile Android Kotlin
+        working-directory: example/android
+        run: ./gradlew :app:compileDebugKotlin --no-daemon --stacktrace
+
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+      - name: Install library
+        run: corepack yarn install --no-frozen-lockfile
+      - name: Install example
+        working-directory: example
+        run: corepack yarn install --no-frozen-lockfile
+      - name: Generate native iOS project
+        working-directory: example
+        run: npx expo prebuild --platform ios --no-install
+      - name: Install CocoaPods
+        working-directory: example/ios
+        run: pod install
+      - name: Compile iOS Simulator
+        run: |
+          python3 - <<'PY'
+          import glob, json, subprocess
+          workspaces = glob.glob('example/ios/*.xcworkspace')
+          if not workspaces:
+            raise RuntimeError('No Xcode workspace generated')
+          workspace = workspaces[0]
+          metadata = json.loads(subprocess.check_output(
+            ['xcodebuild', '-list', '-json', '-workspace', workspace], text=True
+          ))
+          schemes = metadata['workspace']['schemes']
+          scheme = next((s for s in schemes if s != 'Pods'), schemes[0])
+          subprocess.run([
+            'xcodebuild', '-workspace', workspace,
+            '-scheme', scheme, '-configuration', 'Debug',
+            '-destination', 'generic/platform=iOS Simulator',
+            'CODE_SIGNING_ALLOWED=NO', 'build', '-quiet'
+          ], check=True)
+          PY
